@@ -6,10 +6,26 @@ function p = predict(Theta1, Theta2, X)
 % Useful values
 m = size(X, 1);
 num_labels = size(Theta2, 1);
+X = [ones(m, 1) X];
 
+lay1_result = 1 ./ ( 1 + e .^ -(X * Theta1'));
+lay1_result = [ones(m, 1) lay1_result ];
+final_result = 1 ./ (1 + e .^ -(lay1_result * Theta2'));
 % You need to return the following variables correctly 
 p = zeros(size(X, 1), 1);
 
+for i=1:m
+	max_value = 0;
+	index = 1;
+	for j=1:num_labels
+		if final_result(i, j) > max_value
+			max_value = final_result(i, j);
+			index = j;
+		endif
+	end
+
+	p(i) = index;
+end
 % ====================== YOUR CODE HERE ======================
 % Instructions: Complete the following code to make predictions using
 %               your learned neural network. You should set p to a 

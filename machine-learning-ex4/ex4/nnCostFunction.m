@@ -48,11 +48,27 @@ J = J / m;
 reg_sum = sum(sum(Theta1(:, 2:end) .^ 2));
 reg_sum += sum(sum(Theta2(:, 2:end) .^ 2));
 
-J += lambda * reg_sum / (2 * m)
+J += lambda * reg_sum / (2 * m);
 
 Theta1_grad = zeros(size(Theta1));
 Theta2_grad = zeros(size(Theta2));
 
+sum_theta1 = zeros(hidden_layer_size, (input_layer_size+1));
+sum_theta2 = zeros(num_labels, (hidden_layer_size+1));
+
+for i=1:m
+    y_i = zeros(num_labels, 1); % 10 X 1
+    y_i(y(i)) = 1;
+    d_3 = a2(i, :)' - y_i; % 10 X 1
+    d_2 = Theta2' * d_3 .*  sigmoidGradient([1 z1(i, :)]'); % 26 X 1
+    d_2 = d_2(2:end);
+    sum_theta2 += (d_3 * a1(i, :)); % 10 X 26
+    sum_theta1 += (d_2 * X(i, :)); % 25 * 401
+end
+
+sum_theta2 /= m;
+sum_theta1 /= m;
+grad = [sum_theta1(:); sum_theta2(:)];
 % ====================== YOUR CODE HERE ======================
 % Instructions: You should complete the code by working through the
 %               following parts.
@@ -84,31 +100,10 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-% -------------------------------------------------------------
-
 % =========================================================================
 
 % Unroll gradients
-grad = [Theta1_grad(:) ; Theta2_grad(:)];
+%grad = [Theta1_grad(:) ; Theta2_grad(:)];
 
 
 end
